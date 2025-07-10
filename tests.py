@@ -1,12 +1,12 @@
+import pytest
 from main import BooksCollector
 
 class TestBooksCollector:
 
     def test_add_new_book_add_two_books(self):
-        """Проверка добавления двух книг."""
         collector = BooksCollector()
-        collector.add_new_book('Гордость и предубеждение и зомби')
-        collector.add_new_book('Что делать, если ваш кот хочет вас убить')
+        collector.add_new_book("Гордость и предубеждение и зомби")
+        collector.add_new_book("Что делать, если ваш кот хочет вас убить")
         assert len(collector.get_books_genre()) == 2
 
     def test_add_new_book_name_too_long_not_added(self):
@@ -85,4 +85,29 @@ class TestBooksCollector:
         """Проверка, что нельзя добавить в избранное книгу, которой нет в books_genre."""
         collector = BooksCollector()
         collector.add_book_in_favorites('Несуществующая книга')
-        assert len(collector.get_list_of_favorites_books()) == 0    
+        assert len(collector.get_list_of_favorites_books()) == 0
+    def test_get_book_genre_returns_correct_genre(self):
+        collector = BooksCollector()
+        collector.add_new_book("1984")
+        collector.set_book_genre("1984", "Фантастика")
+        assert collector.get_book_genre("1984") == "Фантастика"
+
+    def test_get_books_genre_returns_full_dict(self):
+        collector = BooksCollector()
+        collector.add_new_book("1984")
+        collector.add_new_book("Шерлок")
+        collector.set_book_genre("1984", "Фантастика")
+        collector.set_book_genre("Шерлок", "Детективы")
+        expected_dict = {"1984": "Фантастика", "Шерлок": "Детективы"}
+        assert collector.get_books_genre() == expected_dict
+
+    @pytest.mark.parametrize('book_name, genre, expected_genre', [
+        ("1984", "Фантастика", "Фантастика"),
+        ("Шерлок", "Детективы", "Детективы"),
+        ("Книга без жанра", "", ""),
+    ])
+    def test_set_and_get_book_genre_parametrized(self, book_name, genre, expected_genre):
+        collector = BooksCollector()
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, genre)
+        assert collector.get_book_genre(book_name) == expected_genre    
